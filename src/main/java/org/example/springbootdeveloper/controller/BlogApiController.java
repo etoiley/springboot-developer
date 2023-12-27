@@ -39,4 +39,25 @@ public class BlogApiController {
         return ResponseEntity.ok()
                 .body(articles);
     }
+
+    @GetMapping("/api/articles/{id}")
+    //URL 경로에서 값 추출
+    public ResponseEntity<ArticleResponse> findArticle(@PathVariable(name = "id") long id){
+        // ^ mapping의 {id}값이 @PathVariable의 id값으로 넘어옴
+        Article article = blogService.findById(id);
+
+        return ResponseEntity.ok()
+                .body(new ArticleResponse(article));
+
+        //@PathVariable 어노테이션은 URL에서 값을 가져오는 어노테이션이다.
+    }
+
+    @DeleteMapping("/api/articles/{id}")
+    public ResponseEntity<Void> deleteArticle(@PathVariable(name = "id") long id){
+
+        blogService.delete(id);
+        return ResponseEntity.ok()
+                .build();
+    }
+
 }

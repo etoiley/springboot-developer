@@ -21,7 +21,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest//테스트용 애플리케이션 컨텍스트
@@ -74,5 +75,78 @@ class BlogApiControllerTest {
         assertThat(articles.get(0).getContent()).isEqualTo(content);
 
     }
+
+    @DisplayName("findAllArticles : 블로그 글 목록 조회에 성공한다.")
+    @Test
+    public void findAllArticles() throws Exception{
+        //given : 블로그 글을 저장한다.
+        final String url = "/api/articles";
+        final String title = "title";
+        final String content = "content";
+
+        blogRepository.save(Article.builder()
+                        .title(title)
+                        .content(content)
+                        .build());
+
+        //when : 목록 조회 API를 호출한다.
+        final ResultActions resultActions = mockMvc.perform(get(url)
+                                                    .accept(MediaType.APPLICATION_JSON));
+        //Then : 응답 코드가 200 OK이고, 반환받은 값 중에 0번재 요소의 content와 title이 저장된 값과 같은지 확인한다.
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].content").value(content))
+                .andExpect(jsonPath("$[0].title").value(title));
+    }
+
+    @DisplayName("findArticles : 블로그 글 조회에 성공한다.")
+    @Test
+    public void findArticles() throws Exception{
+        //given : 블로그 글을 저장한다.
+        final String url = "/api/articles/{id}";
+        final String title = "title";
+        final String content = "content";
+
+        Article savedArticle = blogRepository.save(Article.builder()
+                .title(title)
+                .content(content)
+                .build());
+
+        //when : 저장한 블로그 글의 id값으로 api를 호출한다.
+        final ResultActions resultActions = mockMvc.perform(get(url, savedArticle.getId()));
+
+        //Then : 응답 코드가 200 OK이고, 반환받은 content와 title이 저장된 값과 같은지 확인한다.
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").value(content))
+                .andExpect(jsonPath("$.title").value(title));
+
+    }
+
+    @DisplayName("findArticles : 블로그 글 삭제에 성공한다.")
+    @Test
+    public void deleteArticle() throws Exception{
+        //given : 블로그 글을 저장한다.
+        final String url = "/api/articles/{id}";
+        final String title = "title";
+        final String content = "content";
+
+        Article savedArticle = blogRepository.save(Article.builder()
+                .title(title)
+                .content(content)
+                .build());
+
+        //when : 저장한 블로그 글의 id값으로 삭제 api를 호출한다.
+        mockMvc.perform(delete(url, savedArticle.getId()))
+                .andExpect(status().isOk());
+
+        //Then : 응답 코드가 200 OK이고, 블로그 글 리스트를 전체 조회해 조회한 배열 크기가 0인지 확인합니다.
+        List<Article> articles = blogRepository.findAll();
+        assertThat(articles).isEmpty();
+    }
+    
+
+
+
 
 }

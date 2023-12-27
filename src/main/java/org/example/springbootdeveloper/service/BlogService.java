@@ -24,4 +24,17 @@ public class BlogService {
         return blogRepository.findAll();
         //findAll()은 JPA의 지원메소드
     }
+
+    //글 조회 메소드
+    public Article findById(long id){
+        return blogRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("not found : " + id));
+        //findById() 메소드 : JPA에서 제공하는 findById() 메소드이다.
+        //엔티티를 조회하고 없으면 IllegalArgumentException 예외를 발생한다.
+    }
+
+    //글 삭제 메소드
+    public void delete(long id){
+        blogRepository.deleteById(id);
+    }
 }
