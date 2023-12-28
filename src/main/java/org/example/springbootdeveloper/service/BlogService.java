@@ -1,8 +1,10 @@
 package org.example.springbootdeveloper.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.springbootdeveloper.domain.Article;
 import org.example.springbootdeveloper.dto.AddArticleRequest;
+import org.example.springbootdeveloper.dto.UpdateArticleRequest;
 import org.example.springbootdeveloper.repository.BlogRepository;
 import org.springframework.stereotype.Service;
 
@@ -37,4 +39,16 @@ public class BlogService {
     public void delete(long id){
         blogRepository.deleteById(id);
     }
+
+    //글 수정 메소드
+    @Transactional //트랜잭션 메소드
+    public Article update(long id, UpdateArticleRequest request){
+        Article article = blogRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("not found : " + id));
+        article.update(request.getTitle(), request.getContent());
+        return article;
+        //@Transactional 어노테이션은 매칭한 메소드를 하나의 트랜잭션으로 묶는 역할을 한다.
+        //update().메소드는 엔티티의 필드값이 바뀌면 중간에 에러가 발생해도 제대로 된 값 수정을 보장하게 되었다.
+    }
+
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.springbootdeveloper.domain.Article;
 import org.example.springbootdeveloper.dto.AddArticleRequest;
+import org.example.springbootdeveloper.dto.UpdateArticleRequest;
 import org.example.springbootdeveloper.repository.BlogRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -20,6 +21,7 @@ import org.springframework.web.context.WebApplicationContext;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -144,9 +146,43 @@ class BlogApiControllerTest {
         List<Article> articles = blogRepository.findAll();
         assertThat(articles).isEmpty();
     }
-    
+    @DisplayName("findArticles : 블로그 글 수정에 성공한다.")
+    @Test
+    public void updateArticle() throws Exception{
+        //given : 블로그 글을 저장하고, 블로그 글 수정에 필요한 요청 객체를 만든다.
+        final String url = "/api/articles/{id}";
+        final String title = "title";
+        final String content = "content";
+
+        Article savedArticle = blogRepository.save(Article.builder()
+                .title(title)
+                .content(content)
+                .build());
+        final String newTitle = "new title";
+        final String newContent = "new content";
+
+        UpdateArticleRequest request = new UpdateArticleRequest(newTitle, newContent);
+
+        //when : UPDATE API로 수정 요청을 보낸다. 이때 요청 타입은 JSON이며, given절에서 미리 만들어둔 객체를
+        //         요청 본문으로 함께 보낸다.
+        ResultActions result = mockMvc.perform(put(url, savedArticle.getId())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(request)));
 
 
+        //Then : 응답 코드가 200 OK인지 확인한다. 블로그 글 id로 조회한 후 값이 수정되었는지 확인한다.
+        result.andExpect((status().isOk()));
+        Article article = getById(savedArticle).get();
+        //Optional 을 사용하면 그 안의 값은 Optional.get() 메소드를 통해 접근 할 수 있다.
+
+
+        assertThat(article.getTitle()).isEqualTo(newTitle);
+        assertThat(article.getContent()).isEqualTo(newContent);
+    }
+
+    private Optional<Article> getById(Article savedArticle) {
+        return blogRepository.findById(savedArticle.getId());
+    }
 
 
 }
