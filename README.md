@@ -3,3 +3,4 @@
 2023-12-17 ~ 
 
 Blog API 만들기 
+thymeleaf 사용
