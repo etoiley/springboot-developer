@@ -26,6 +26,13 @@ dependencies {
     runtimeOnly("com.h2database:h2")
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
+    //스프링 시큐리티
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    // 스프링 시큐리티를 사용하기 위한 스타터 추가
+    implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
+    // 타임리프에서 스프링 시큐리티를 사용하기 위한 의존성 추가
+    testImplementation("org.springframework.security:spring-security-test")
+    // 스프링 시큐리티를 테스트하기 위한 의존성 추가
 
 
 }
