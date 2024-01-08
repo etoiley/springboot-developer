@@ -50,7 +50,7 @@ public class BlogApiController {
         return ResponseEntity.ok()
                 .body(new ArticleResponse(article));
 
-        //@PathVariable 어노테이션은 URL에서 값을 가져오는 어노테이션이다.
+        //@PathVariable 어노테이션은 URL에서 값을 가져오는 어노테이션이다...
     }
 
     @DeleteMapping("/api/articles/{id}")
